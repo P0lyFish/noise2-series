@@ -201,7 +201,7 @@ def main():
                     # calculate PSNR
                     pred_img, gt_img = util.crop_border([pred_img, gt_img], opt['scale'])
                     avg_psnr += util.calculate_psnr(pred_img, gt_img)
-                    pbar.update('Test {}'.format(img_name))
+                    pbar.update('Test {}'.format(idx))
 
                 avg_psnr = avg_psnr / idx
 

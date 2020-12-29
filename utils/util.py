@@ -724,3 +724,42 @@ def setup_logger(logger_name, root, phase, level=logging.INFO, screen=False, tof
         sh = logging.StreamHandler()
         sh.setFormatter(formatter)
         lg.addHandler(sh)
+
+
+class PadAndCropResizer(object):
+
+    def __init__(self, mode='reflect', **kwargs):
+
+        self.mode = mode
+        self.kwargs = kwargs
+        
+    def _normalize_exclude(self, exclude, n_dim):
+        """Return normalized list of excluded axes."""
+        if exclude is None:
+            return []
+        exclude_list = [exclude] if np.isscalar(exclude) else list(exclude)
+        exclude_list = [d%n_dim for d in exclude_list]
+        len(exclude_list) == len(np.unique(exclude_list)) or _raise(ValueError())
+        all(( isinstance(d,int) and 0<=d<n_dim for d in exclude_list )) or _raise(ValueError())
+        return exclude_list
+
+    def before(self, x, div_n, exclude):
+
+        def _split(v):
+            a = v // 2
+            return a, v-a
+        exclude = self._normalize_exclude(exclude, x.ndim)
+        self.pad = [_split((div_n-s%div_n)%div_n) if (i not in exclude) else (0,0) for i,s in enumerate(x.shape)]
+        x_pad = np.pad(x, self.pad, mode=self.mode, **self.kwargs)
+        for i in exclude:
+            del self.pad[i]
+        return x_pad
+
+    def after(self, x, exclude):
+
+        pads = self.pad[:len(x.shape)]
+        crop = [slice(p[0], -p[1] if p[1]>0 else None) for p in self.pad]
+        for i in self._normalize_exclude(exclude, x.ndim):
+            crop.insert(i,slice(None))
+        len(crop) == x.ndim or _raise(ValueError())
+        return x[tuple(crop)]

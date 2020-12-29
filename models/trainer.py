@@ -37,7 +37,7 @@ class Trainer(BaseTrainer):
         else:
             self.netG = DataParallel(self.netG)
 
-        self.masker = Masker()
+        self.masker = Masker(width=5)
 
         # print network
         self.print_network()
@@ -129,7 +129,7 @@ class Trainer(BaseTrainer):
 
         self.optimizer_G.zero_grad()
 
-        inp, mask = self.masker.mask(self.LQ, step)
+        inp, mask = self.masker.mask(self.LQ, np.random.randint(1000))
         out = self.netG(inp)
 
         l_total = self.cri_pix(out * mask, self.LQ * mask)

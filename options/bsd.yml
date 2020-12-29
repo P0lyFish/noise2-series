@@ -38,8 +38,8 @@ network_G:
 
 #### path
 path:
-  pretrain_model_G: ~
-  strict_load: false
+  pretrain_model_G: ../experiments/pretrained/bsd.pth
+  strict_load: true
   resume_state: ~
 
 #### training settings: learning rate scheme, loss
@@ -58,11 +58,11 @@ train:
   pixel_criterion: l2
   pixel_weight: 1.0
   kl_weight: 0.0
-  val_freq: !!float 5e3
+  val_freq: !!float 11000
 
   manual_seed: 0
 
 #### logger
 logger:
-  print_freq: 10
+  print_freq: 500
   save_checkpoint_freq: !!float 1e4
