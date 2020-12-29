@@ -1,0 +1,16 @@
+name: n2s
+channels:
+- pytorch
+- defaults
+- conda-forge
+dependencies:
+- pytorch
+- six
+- pillow
+- numpy
+- scipy
+- scikit-image
+- ipython
+- torchvision
+- matplotlib
+- jupyter
