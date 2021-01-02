@@ -348,6 +348,7 @@ def show_tensor(tensor, cmap='magma', scale=False):
 
 def tensor_to_numpy(x):
     x = x.detach().cpu().numpy()
+
     if x.ndim == 4:
         x = x[0]
     if x.ndim == 2:
@@ -732,7 +733,7 @@ class PadAndCropResizer(object):
 
         self.mode = mode
         self.kwargs = kwargs
-        
+
     def _normalize_exclude(self, exclude, n_dim):
         """Return normalized list of excluded axes."""
         if exclude is None:

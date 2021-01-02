@@ -14,12 +14,13 @@ datasets:
     interval_list: [1]
     HQ_data: /home/polyfish/Workspace/datasets/n2v_reproducability/gt/test_gt_gaussian0_gaussian0.npy
     LQ_data: /home/polyfish/Workspace/datasets/n2v_reproducability/test/test_noisy0_gaussian25_gaussian25.npy
-    mean: 110.72957232412905
-    std: 63.656060106500874
+    mean: &MEAN 110.72957232412905
+    std: &STD 63.656060106500874
+    need_GT: true
 
     use_shuffle: true
     n_workers: 4  # per GPU
-    batch_size: 32
+    batch_size: 4
     HQ_size: &HQ_SIZE 128
     use_flip: true
     use_rot: true
@@ -29,6 +30,9 @@ datasets:
     interval_list: [1]
     HQ_data: /home/polyfish/Workspace/datasets/n2v_reproducability/gt/test_gt_gaussian0_gaussian0.npy
     LQ_data: /home/polyfish/Workspace/datasets/n2v_reproducability/test/test_noisy0_gaussian25_gaussian25.npy
+    mean: *MEAN
+    std: *STD
+    need_GT: true
 
     use_shuffle: true
     n_workers: 4  # per GPU
@@ -60,7 +64,7 @@ train:
   pixel_criterion: l2
   pixel_weight: 1.0
   kl_weight: 0.0
-  val_freq: !!float 11000
+  val_freq: !!float 1000
 
   manual_seed: 0
 

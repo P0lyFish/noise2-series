@@ -111,7 +111,7 @@ class Noise2TrueTrainer(BaseTrainer):
         self.optimizer_G.zero_grad()
 
         out = self.netG(self.LQ)
-        l_total = self.cri_pix(out, self.LQ)
+        l_total = self.cri_pix(out, self.HQ)
 
         l_total.backward()
         self.optimizer_G.step()

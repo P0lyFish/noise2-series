@@ -4,7 +4,6 @@ import argparse
 import random
 import logging
 import numpy as np
-from skimage.measure import compare_psnr
 
 import torch
 import torch.distributed as dist
@@ -14,6 +13,7 @@ from models import get_trainer
 
 import options.options as option
 from utils import util
+from utils.evaluation_utils import get_scores
 from data import create_dataloader, create_dataset
 
 
@@ -156,7 +156,7 @@ def main():
             model.update_learning_rate(current_step, warmup_iter=opt['train']['warmup_iter'])
 
             #### training
-            model.feed_data(train_data, False)
+            model.feed_data(train_data, opt['datasets']['train']['need_GT'])
             model.optimize_parameters(current_step)
 
             #### log
@@ -189,11 +189,9 @@ def main():
                     model.test()
 
                     visuals = model.get_current_visuals()
-                    mean = opt['datasets']['train']['mean']
-                    std = opt['datasets']['train']['std']
-                    pred_img = util.tensor_to_numpy(visuals['pred'], mean, std)
-                    gt_img = util.tensor_to_numpy(visuals['gt_img'], mean, std)
-                    lq_img = util.tensor_to_numpy(visuals['lq_img'], mean, std)
+                    pred_img = util.tensor_to_numpy(visuals['pred'])
+                    gt_img = util.tensor_to_numpy(visuals['GT'])
+                    lq_img = util.tensor_to_numpy(visuals['LQ'])
 
                     # Save SR images for reference
                     save_img_path = os.path.join(img_dir,
@@ -201,7 +199,8 @@ def main():
                     util.save_img(np.hstack((lq_img, pred_img, gt_img)), save_img_path)
 
                     # calculate PSNR
-                    avg_psnr += compare_psnr(pred_img, gt_img)
+                    _, psnr, _ = get_scores(pred_img, gt_img)
+                    avg_psnr += psnr
                     pbar.update('Test {}'.format(idx))
 
                 avg_psnr = avg_psnr / idx
