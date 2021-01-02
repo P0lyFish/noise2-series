@@ -4,14 +4,13 @@ import argparse
 import random
 import logging
 import numpy as np
-import cv2
 from skimage.measure import compare_psnr
 
 import torch
 import torch.distributed as dist
 import torch.multiprocessing as mp
 from data.data_sampler import DistIterSampler
-from models import make_trainer
+from models import get_trainer
 
 import options.options as option
 from utils import util
@@ -190,9 +189,11 @@ def main():
                     model.test()
 
                     visuals = model.get_current_visuals()
-                    pred_img = util.tensor_to_numpy(visuals['pred'])
-                    gt_img = util.tensor_to_numpy(visuals['gt_img'])
-                    lq_img = util.tensor_to_numpy(visuals['lq_img'])
+                    mean = opt['datasets']['train']['mean']
+                    std = opt['datasets']['train']['std']
+                    pred_img = util.tensor_to_numpy(visuals['pred'], mean, std)
+                    gt_img = util.tensor_to_numpy(visuals['gt_img'], mean, std)
+                    lq_img = util.tensor_to_numpy(visuals['lq_img'], mean, std)
 
                     # Save SR images for reference
                     save_img_path = os.path.join(img_dir,
