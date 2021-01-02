@@ -16,7 +16,7 @@ from mask import Masker
 logger = logging.getLogger('base')
 
 
-class Trainer(BaseTrainer):
+class Noise2SelfTrainer(BaseTrainer):
     def __init__(self, opt):
         super(Trainer, self).__init__(opt)
 
@@ -111,19 +111,6 @@ class Trainer(BaseTrainer):
 
             self.log_dict = OrderedDict()
 
-    def feed_data(self, data, need_GT=True):
-        self.LQ = data['LQ'].to(self.device)
-        if need_GT:
-            self.HQ = data['HQ'].to(self.device)
-        # LQ_numpy = self.LQ[0, 0, :, :].cpu().numpy()
-        # cv2.imwrite('LQ.png', LQ_numpy * 255.)
-
-
-    def set_params_lr_zero(self, groups):
-        # fix normal module
-        for group in groups:
-            self.optimizers[0].param_groups[group]['lr'] = 0
-
     def optimize_parameters(self, step):
         batchsz, _, _, _ = self.LQ.shape
 
@@ -140,44 +127,3 @@ class Trainer(BaseTrainer):
         # set log
         self.log_dict['l_total'] = l_total.item() / batchsz
 
-    def test(self):
-        self.netG.eval()
-        with torch.no_grad():
-            self.pred = self.netG(self.LQ)
-        self.netG.train()
-
-    def get_current_log(self):
-        return self.log_dict
-
-    def get_current_visuals(self, need_GT=True):
-        out_dict = OrderedDict()
-        out_dict['LQ'] = self.LQ.detach()[0].float().cpu()
-        out_dict['GT'] = self.HQ.detach()[0].float().cpu()
-        out_dict['pred'] = self.pred.detach()[0].float().cpu()
-        return out_dict
-
-    def print_network(self):
-        s, n = self.get_network_description(self.netG)
-        if isinstance(self.netG, nn.DataParallel):
-            net_struc_str = '{} - {}'.format(
-                self.netG.__class__.__name__,
-                self.netG.module.__class__.__name__
-            )
-        else:
-            net_struc_str = '{}'.format(self.netG.__class__.__name__)
-        if self.rank <= 0:
-            logger.info('Network G structure: {}, \
-                        with parameters: {:,d}'.format(net_struc_str, n))
-            logger.info(s)
-
-    def load(self):
-        if self.opt['path']['pretrain_model_G']:
-            load_path_G = self.opt['path']['pretrain_model_G']
-            if load_path_G is not None:
-                logger.info('Loading model for G [{:s}]\
-                            ...'.format(load_path_G))
-                self.load_network(load_path_G, self.netG,
-                                  self.opt['path']['strict_load'])
-
-    def save(self, iter_label):
-        self.save_network(self.netG, 'G', iter_label)

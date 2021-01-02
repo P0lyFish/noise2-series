@@ -5,12 +5,13 @@ import random
 import logging
 import numpy as np
 import cv2
+from skimage.measure import compare_psnr
 
 import torch
 import torch.distributed as dist
 import torch.multiprocessing as mp
 from data.data_sampler import DistIterSampler
-from models.trainer import Trainer
+from models import make_trainer
 
 import options.options as option
 from utils import util
@@ -128,7 +129,7 @@ def main():
     assert train_loader is not None
 
     #### create model
-    model = Trainer(opt)
+    model = get_trainer(opt)
     print('Model created!')
 
     #### resume training
@@ -189,9 +190,9 @@ def main():
                     model.test()
 
                     visuals = model.get_current_visuals()
-                    pred_img = util.tensor2img(visuals['pred'])  # uint8
-                    gt_img = util.tensor2img(visuals['GT'])  # uint8
-                    lq_img = util.tensor2img(visuals['LQ'])
+                    pred_img = util.tensor_to_numpy(visuals['pred'])
+                    gt_img = util.tensor_to_numpy(visuals['gt_img'])
+                    lq_img = util.tensor_to_numpy(visuals['lq_img'])
 
                     # Save SR images for reference
                     save_img_path = os.path.join(img_dir,
@@ -199,8 +200,7 @@ def main():
                     util.save_img(np.hstack((lq_img, pred_img, gt_img)), save_img_path)
 
                     # calculate PSNR
-                    pred_img, gt_img = util.crop_border([pred_img, gt_img], opt['scale'])
-                    avg_psnr += util.calculate_psnr(pred_img, gt_img)
+                    avg_psnr += compare_psnr(pred_img, gt_img)
                     pbar.update('Test {}'.format(idx))
 
                 avg_psnr = avg_psnr / idx

@@ -13,23 +13,50 @@ class BaseTrainer():
         self.schedulers = []
         self.optimizers = []
 
-    def feed_data(self, data):
-        pass
+    def feed_data(self, data, need_GT=True):
+        self.LQ = data['LQ'].to(self.device)
+        if need_GT:
+            self.HQ = data['HQ'].to(self.device)
 
     def optimize_parameters(self):
         pass
 
     def get_current_visuals(self):
-        pass
+        out_dict = OrderedDict()
+        out_dict['LQ'] = self.LQ.detach()[0].float().cpu()
+        out_dict['GT'] = self.HQ.detach()[0].float().cpu()
+        out_dict['pred'] = self.pred.detach()[0].float().cpu()
+        return out_dict
 
-    def get_current_losses(self):
-        pass
+    def get_current_log(self):
+        return self.log_dict
+
+    def load(self):
+        if self.opt['path']['pretrain_model_G']:
+            load_path_G = self.opt['path']['pretrain_model_G']
+            if load_path_G is not None:
+                logger.info('Loading model for G [{:s}]\
+                            ...'.format(load_path_G))
+                self.load_network(load_path_G, self.netG,
+                                  self.opt['path']['strict_load'])
+
+    def save(self, iter_label):
+        self.save_network(self.netG, 'G', iter_label)
 
     def print_network(self):
-        pass
+        s, n = self.get_network_description(self.netG)
+        if isinstance(self.netG, nn.DataParallel):
+            net_struc_str = '{} - {}'.format(
+                self.netG.__class__.__name__,
+                self.netG.module.__class__.__name__
+            )
+        else:
+            net_struc_str = '{}'.format(self.netG.__class__.__name__)
+        if self.rank <= 0:
+            logger.info('Network G structure: {}, \
+                        with parameters: {:,d}'.format(net_struc_str, n))
+            logger.info(s)
 
-    def save(self, label):
-        pass
 
     def load(self):
         pass
@@ -125,3 +152,9 @@ class BaseTrainer():
             self.optimizers[i].load_state_dict(o)
         for i, s in enumerate(resume_schedulers):
             self.schedulers[i].load_state_dict(s)
+
+    def test(self):
+        self.netG.eval()
+        with torch.no_grad():
+            self.pred = self.netG(self.LQ)
+        self.netG.train()
