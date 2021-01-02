@@ -11,7 +11,6 @@ from models.unet import Unet
 import numpy as np
 import cv2
 from utils.util import tensor2img
-from mask import Masker
 
 logger = logging.getLogger('base')
 
