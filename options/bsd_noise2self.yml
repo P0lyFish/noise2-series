@@ -1,7 +1,7 @@
 #### general settings
-name: BSD68
+name: BSD68_noise2self
 use_tb_logger: true
-model: video_base
+trainer: noise2self
 distortion: deblur
 scale: 1
 gpu_ids: [0]
@@ -14,6 +14,8 @@ datasets:
     interval_list: [1]
     HQ_data: ~
     LQ_data: ../BSD68/train/DCNN400_train_gaussian25.npy
+    mean: 110.72957232412905
+    std: 63.656060106500874
 
     use_shuffle: true
     n_workers: 4  # per GPU

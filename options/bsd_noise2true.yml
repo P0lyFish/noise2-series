@@ -1,7 +1,7 @@
 #### general settings
 name: BSD68_noise2true
 use_tb_logger: true
-model: noise2true
+trainer: noise2true
 distortion: deblur
 scale: 1
 gpu_ids: [0]
@@ -12,8 +12,10 @@ datasets:
     name: BSD68
     mode: BSD68
     interval_list: [1]
-    HQ_data: ../BSD68/train/
-    LQ_data: ../BSD68/train/DCNN400_train_gaussian25.npy
+    HQ_data: /home/polyfish/Workspace/datasets/n2v_reproducability/gt/test_gt_gaussian0_gaussian0.npy
+    LQ_data: /home/polyfish/Workspace/datasets/n2v_reproducability/test/test_noisy0_gaussian25_gaussian25.npy
+    mean: 110.72957232412905
+    std: 63.656060106500874
 
     use_shuffle: true
     n_workers: 4  # per GPU
@@ -25,8 +27,8 @@ datasets:
     name: BSD68
     mode: BSD68
     interval_list: [1]
-    HQ_data: ../BSD68/test/bsd68_groundtruth.npy
-    LQ_data: ../BSD68/test/bsd68_gaussian25.npy
+    HQ_data: /home/polyfish/Workspace/datasets/n2v_reproducability/gt/test_gt_gaussian0_gaussian0.npy
+    LQ_data: /home/polyfish/Workspace/datasets/n2v_reproducability/test/test_noisy0_gaussian25_gaussian25.npy
 
     use_shuffle: true
     n_workers: 4  # per GPU
@@ -38,7 +40,7 @@ network_G:
 
 #### path
 path:
-  pretrain_model_G: ../experiments/pretrained/bsd.pth
+  pretrain_model_G: ~
   strict_load: true
   resume_state: ~
 
@@ -65,4 +67,4 @@ train:
 #### logger
 logger:
   print_freq: 500
-  save_checkpoint_freq: !!float 1e4
+  save_checkpoint_freq: !!float 1e3

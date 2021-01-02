@@ -9,8 +9,6 @@ from .base_trainer import BaseTrainer
 from models.loss import CharbonnierLoss
 from models.unet import Unet
 import numpy as np
-import cv2
-from utils.util import tensor2img
 from mask import Masker
 
 logger = logging.getLogger('base')
@@ -18,7 +16,7 @@ logger = logging.getLogger('base')
 
 class Noise2SelfTrainer(BaseTrainer):
     def __init__(self, opt):
-        super(Trainer, self).__init__(opt)
+        super(Noise2SelfTrainer, self).__init__(opt)
 
         if opt['dist']:
             self.rank = torch.distributed.get_rank()

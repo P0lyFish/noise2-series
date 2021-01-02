@@ -8,16 +8,13 @@ import models.lr_scheduler as lr_scheduler
 from .base_trainer import BaseTrainer
 from models.loss import CharbonnierLoss
 from models.unet import Unet
-import numpy as np
-import cv2
-from utils.util import tensor2img
 
 logger = logging.getLogger('base')
 
 
 class Noise2TrueTrainer(BaseTrainer):
     def __init__(self, opt):
-        super(Trainer, self).__init__(opt)
+        super(Noise2TrueTrainer, self).__init__(opt)
 
         if opt['dist']:
             self.rank = torch.distributed.get_rank()

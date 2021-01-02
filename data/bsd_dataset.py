@@ -4,6 +4,7 @@ support reading images from lmdb
 '''
 import logging
 import numpy as np
+import random
 import torch
 import torch.utils.data as data
 
@@ -55,6 +56,13 @@ class BSD68Dataset(data.Dataset):
             img_HQ = None
 
         if self.opt['phase'] == 'train':
+            H, W, _ = img_LQ.shape
+            HQ_size = self.opt['HQ_size']
+            rnd_h = random.randint(0, max(0, H - HQ_size))
+            rnd_w = random.randint(0, max(0, W - HQ_size))
+            img_LQ = img_LQ[rnd_h:rnd_h + HQ_size, rnd_w:rnd_w + HQ_size, :]
+            img_HQ = img_HQ[rnd_h:rnd_h + HQ_size, rnd_w:rnd_w + HQ_size, :]
+
             rlt = util.augment([img_LQ, img_HQ], self.opt['use_flip'],
                                self.opt['use_rot'])
             img_LQ = rlt[0]
