@@ -197,6 +197,9 @@ def augment(img_list, hflip=True, rot=True):
     rot90 = rot and random.random() < 0.5
 
     def _augment(img):
+        if img is None:
+            return img
+
         if hflip:
             img = img[:, ::-1, :]
         if vflip:
