@@ -17,9 +17,9 @@ class BaseTrainer():
         self.schedulers = []
         self.optimizers = []
 
-    def feed_data(self, data, need_GT=True):
+    def feed_data(self, data):
         self.LQ = data['LQ'].to(self.device)
-        if need_GT:
+        if 'HQ' in data.keys():
             self.HQ = data['HQ'].to(self.device)
 
     def optimize_parameters(self):

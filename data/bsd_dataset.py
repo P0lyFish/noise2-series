@@ -32,28 +32,24 @@ class BSD68Dataset(data.Dataset):
         else:
             self.need_GT = False
 
-        self.mean = opt['mean']
-        self.std = opt['std']
-
-        # if opt['phase'] == 'val':
-        #    self.LQ_data = self.LQ_data[60:]
-        #    self.HQ_data = self.HQ_data[60:]
-
         self.cropper = PadAndCropResizer()
 
         assert self.LQ_data.shape[0], 'Error: LQ data is empty.'
 
     def __getitem__(self, index):
         img_LQ = self.LQ_data[index]
-        img_LQ = self.cropper.before(img_LQ, 16, None)
-        img_LQ = img_LQ[:, :, np.newaxis]
-
         if self.need_GT:
             img_HQ = self.HQ_data[index]
-            img_HQ = self.cropper.before(img_HQ, 16, None)
-            img_HQ = img_HQ[:, :, np.newaxis]
         else:
             img_HQ = None
+
+        if self.opt['phase'] == 'val':
+            img_LQ = self.cropper.before(img_LQ, 16, None)
+            img_HQ = self.cropper.before(img_HQ, 16, None)
+
+        img_LQ = img_LQ[:, :, np.newaxis] / 255.
+        if self.need_GT:
+            img_HQ = img_HQ[:, :, np.newaxis] / 255.
 
         if self.opt['phase'] == 'train':
             H, W, _ = img_LQ.shape
@@ -61,7 +57,8 @@ class BSD68Dataset(data.Dataset):
             rnd_h = random.randint(0, max(0, H - HQ_size))
             rnd_w = random.randint(0, max(0, W - HQ_size))
             img_LQ = img_LQ[rnd_h:rnd_h + HQ_size, rnd_w:rnd_w + HQ_size, :]
-            img_HQ = img_HQ[rnd_h:rnd_h + HQ_size, rnd_w:rnd_w + HQ_size, :]
+            if self.need_GT:
+                img_HQ = img_HQ[rnd_h:rnd_h + HQ_size, rnd_w:rnd_w + HQ_size, :]
 
             rlt = util.augment([img_LQ, img_HQ], self.opt['use_flip'],
                                self.opt['use_rot'])
@@ -70,12 +67,10 @@ class BSD68Dataset(data.Dataset):
 
         img_LQ = np.transpose(img_LQ, (2, 0, 1))
         img_LQ = torch.from_numpy(np.ascontiguousarray(img_LQ)).float()
-        img_LQ = (img_LQ - self.mean) / self.std
 
         if img_HQ is not None:
             img_HQ = np.transpose(img_HQ, (2, 0, 1))
             img_HQ = torch.from_numpy(np.ascontiguousarray(img_HQ)).float()
-            img_HQ = (img_HQ - self.mean) / self.std
 
         if img_HQ is not None:
             return {'LQ': img_LQ, 'HQ': img_HQ}

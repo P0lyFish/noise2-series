@@ -156,7 +156,7 @@ def main():
             model.update_learning_rate(current_step, warmup_iter=opt['train']['warmup_iter'])
 
             #### training
-            model.feed_data(train_data, opt['datasets']['train']['need_GT'])
+            model.feed_data(train_data)
             model.optimize_parameters(current_step)
 
             #### log
@@ -185,13 +185,13 @@ def main():
                     img_dir = os.path.join(opt['path']['val_images'])
                     util.mkdir(img_dir)
 
-                    model.feed_data(val_data, True)
+                    model.feed_data(val_data)
                     model.test()
 
                     visuals = model.get_current_visuals()
-                    pred_img = util.tensor_to_numpy(visuals['pred'])
-                    gt_img = util.tensor_to_numpy(visuals['GT'])
-                    lq_img = util.tensor_to_numpy(visuals['LQ'])
+                    pred_img = util.tensor_to_numpy(visuals['pred']) * 255.
+                    gt_img = util.tensor_to_numpy(visuals['GT']) * 255.
+                    lq_img = util.tensor_to_numpy(visuals['LQ']) * 255.
 
                     # Save SR images for reference
                     save_img_path = os.path.join(img_dir,
@@ -199,7 +199,7 @@ def main():
                     util.save_img(np.hstack((lq_img, pred_img, gt_img)), save_img_path)
 
                     # calculate PSNR
-                    _, psnr, _ = get_scores(pred_img, gt_img)
+                    psnr = util.calculate_psnr(pred_img, gt_img)
                     avg_psnr += psnr
                     pbar.update('Test {}'.format(idx))
 

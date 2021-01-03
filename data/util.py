@@ -551,6 +551,12 @@ def imresize_np(img, scale, antialiasing=True):
     return out_2.numpy()
 
 
+def normailize(x):
+    mean = x.mean()
+    std = x.std()
+    return (x - mean) / std
+
+
 if __name__ == '__main__':
     # test imresize function
     # read images
