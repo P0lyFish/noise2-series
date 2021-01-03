@@ -43,10 +43,6 @@ class BSD68Dataset(data.Dataset):
         else:
             img_HQ = None
 
-        if self.opt['phase'] == 'val':
-            img_LQ = self.cropper.before(img_LQ, 16, None)
-            img_HQ = self.cropper.before(img_HQ, 16, None)
-
         img_LQ = img_LQ[:, :, np.newaxis] / 255.
         if self.need_GT:
             img_HQ = img_HQ[:, :, np.newaxis] / 255.
@@ -58,7 +54,8 @@ class BSD68Dataset(data.Dataset):
             rnd_w = random.randint(0, max(0, W - HQ_size))
             img_LQ = img_LQ[rnd_h:rnd_h + HQ_size, rnd_w:rnd_w + HQ_size, :]
             if self.need_GT:
-                img_HQ = img_HQ[rnd_h:rnd_h + HQ_size, rnd_w:rnd_w + HQ_size, :]
+                img_HQ = img_HQ[rnd_h:rnd_h + HQ_size,
+                                rnd_w:rnd_w + HQ_size, :]
 
             rlt = util.augment([img_LQ, img_HQ], self.opt['use_flip'],
                                self.opt['use_rot'])
