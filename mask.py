@@ -28,7 +28,7 @@ class Masker():
             masked = X * mask_inv
         else:
             raise NotImplementedError
-            
+
         if self.include_mask_as_input:
             net_input = torch.cat((masked, mask.repeat(X.shape[0], 1, 1, 1)), dim=1)
         else:

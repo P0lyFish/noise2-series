@@ -5,7 +5,7 @@ logger = logging.getLogger('base')
 def get_trainer(opt):
     model = opt['trainer']
     # image restoration
-    if model == 'noise2same':
+    if model == 'noise2self':
         from .noise2self_trainer import Noise2SelfTrainer as M
     elif model == 'noise2true':
         from .noise2true_trainer import Noise2TrueTrainer as M
