@@ -35,7 +35,7 @@ class Noise2SelfTrainer(BaseTrainer):
         else:
             self.netG = DataParallel(self.netG)
 
-        self.masker = Masker(width=5)
+        self.masker = Masker(width=3, mode='interpolate')
 
         # print network
         self.print_network()
@@ -124,4 +124,3 @@ class Noise2SelfTrainer(BaseTrainer):
 
         # set log
         self.log_dict['l_total'] = l_total.item() / batchsz
-
