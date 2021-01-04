@@ -12,7 +12,7 @@ datasets:
     mode: BSD68
     interval_list: [1]
     HQ_data: ~
-    LQ_data: ../myBSD68/train/noise.npy
+    LQ_data: ../BSD68/train/noise.npy
 
     use_shuffle: true
     n_workers: 4  # per GPU
@@ -24,8 +24,8 @@ datasets:
     name: BSD68
     mode: BSD68
     interval_list: [1]
-    HQ_data: ../myBSD68/val/clean.npy
-    LQ_data: ../myBSD68/val/noise.npy
+    HQ_data: ../BSD68/val/clean.npy
+    LQ_data: ../BSD68/val/noise.npy
 
     use_shuffle: false
     n_workers: 4  # per GPU
