@@ -9,6 +9,8 @@ def get_trainer(opt):
         from .noise2self_trainer import Noise2SelfTrainer as M
     elif model == 'noise2true':
         from .noise2true_trainer import Noise2TrueTrainer as M
+    elif model == 'noise2same':
+        from .noise2same_trainer import Noise2SameTrainer as M
     else:
         raise NotImplementedError('Trainer [{:s}] not recognized.'.format(model))
     m = M(opt)
