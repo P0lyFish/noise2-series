@@ -13,7 +13,6 @@ from models import get_trainer
 
 import options.options as option
 from utils import util
-from utils.evaluation_utils import get_scores
 from data import create_dataloader, create_dataset
 
 

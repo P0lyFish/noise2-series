@@ -35,7 +35,8 @@ class Noise2SelfTrainer(BaseTrainer):
         else:
             self.netG = DataParallel(self.netG)
 
-        self.masker = Masker(width=3, mode='interpolate')
+        self.masker = Masker(width=3, sample_method='phase',
+                             mode='interpolate')
 
         # print network
         self.print_network()
