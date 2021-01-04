@@ -92,8 +92,8 @@ def stratified_mask(X, box_size):
     for i in range(box_count_x):
         for j in range(box_count_y):
             x, y = np.random.rand(), np.random.rand()
-            x = int(i * box_size + x)
-            y = int(j * box_size + y)
+            x = int(i * box_size + x * box_size)
+            y = int(j * box_size + y * box_size)
             if x < H and y < W:
                 x_coords.append(x)
                 y_coords.append(y)
