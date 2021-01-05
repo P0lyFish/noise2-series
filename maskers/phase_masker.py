@@ -5,7 +5,7 @@ import torch
 class PhaseMasker():
     """Object for masking and demasking"""
 
-    def __init__(self, box_size, mode='interpolate'):
+    def __init__(self, width=3, mode='interpolate'):
         self.grid_size = width
         self.n_masks = width ** 2
 
