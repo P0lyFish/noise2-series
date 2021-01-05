@@ -36,7 +36,7 @@ class StratifiedMasker():
         mask_inv = torch.ones(mask.shape).to(X.device) - mask
 
         if self.mode == 'interpolate':
-            masked = interpolate_mask(X, mask, mask_inv)
+            masked = self.interpolate_mask(X, mask, mask_inv)
         elif self.mode == 'zero':
             masked = X * mask_inv
         else:
