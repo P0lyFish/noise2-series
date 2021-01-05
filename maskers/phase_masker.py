@@ -1,8 +1,9 @@
 import numpy as np
 import torch
+from maskers.base_masker import BaseMasker
 
 
-class PhaseMasker():
+class PhaseMasker(BaseMasker):
     """Object for masking and demasking"""
 
     def __init__(self, width=3, mode='interpolate'):

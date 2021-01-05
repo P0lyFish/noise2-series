@@ -115,7 +115,7 @@ class Noise2VoidTrainer(BaseTrainer):
 
         self.optimizer_G.zero_grad()
 
-        inp, mask = self.masker.mask(self.LQ, np.random.randint(1000))
+        inp, mask = self.masker.mask(self.LQ)
         out = self.netG(inp)
 
         l_total = self.cri_pix(out * mask, self.LQ * mask)

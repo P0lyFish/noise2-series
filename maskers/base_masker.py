@@ -1,4 +1,8 @@
-class Masker:
+import torch
+import numpy as np
+
+
+class BaseMasker:
     def mask(self, X):
         pass
 

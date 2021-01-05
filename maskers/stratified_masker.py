@@ -1,8 +1,9 @@
 import numpy as np
 import torch
+from maskers.base_masker import BaseMasker
 
 
-class StratifiedMasker():
+class StratifiedMasker(BaseMasker):
     """Object for masking and demasking"""
 
     def __init__(self, mode='zero', box_size=None):
@@ -27,7 +28,7 @@ class StratifiedMasker():
                     y_coords.append(y)
         mask[x_coords, y_coords] = 1.
 
-    return mask
+        return mask
 
     def mask(self, X):
         mask = self.stratified_mask(X, self.box_size)
