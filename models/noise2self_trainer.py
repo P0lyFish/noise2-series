@@ -9,7 +9,7 @@ from .base_trainer import BaseTrainer
 from models.loss import CharbonnierLoss
 from models.unet import Unet
 import numpy as np
-from mask import Masker
+from maskers.phase_masker import PhaseMasker
 
 logger = logging.getLogger('base')
 
@@ -35,8 +35,7 @@ class Noise2SelfTrainer(BaseTrainer):
         else:
             self.netG = DataParallel(self.netG)
 
-        self.masker = Masker(width=3, sample_method='phase',
-                             mode='interpolate')
+        self.masker = PhaseMasker(width=3, mode='interpolate')
 
         # print network
         self.print_network()

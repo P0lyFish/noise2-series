@@ -9,7 +9,7 @@ from .base_trainer import BaseTrainer
 from models.loss import CharbonnierLoss
 from models.unet import Unet
 import numpy as np
-from mask import Masker
+from maskers.stratified_masker import StratifiedMasker
 
 logger = logging.getLogger('base')
 
@@ -35,9 +35,7 @@ class Noise2SameTrainer(BaseTrainer):
         else:
             self.netG = DataParallel(self.netG)
 
-        self.masker = Masker(width=3, sample_method='stratified',
-                             mode='interpolate',
-                             box_size=train_opt['box_size'])
+        self.masker = StratifiedMasker(box_size=train_opt['box_size'], mode='interpolate')
 
         # print network
         self.print_network()
