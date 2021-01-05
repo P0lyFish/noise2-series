@@ -1,7 +1,6 @@
 # Noise2 series - Reproducing results of noise2-series denoisers
 This repository is an unofficial pytorch implementation of noise2-series denoisers, including noise2noise, noise2void, noise2self and noise2same.
 
-
 ## Dependencies and Installation
 * Python >= 3.7
 * Pytorch >= 1.4.0
@@ -9,11 +8,11 @@ This repository is an unofficial pytorch implementation of noise2-series denoise
 
 ## Usage
 ### Training
-You can train your own model using the following command:
+You can train your model using the following command:
 ```
 python train.py -opt path_to_yaml_file
 ```
-where `path_to_yaml_file` is the path to yaml file that contain training configurations. You can find some default configurations in `options` folder. Checkpoints and logs will be saved in `../experiments/modelName`
+where `path_to_yaml_file` is the path to the yaml file that contains training configurations. You can find some default configurations in `options` folder. Checkpoints and logs will be saved in `../experiments/modelName`
 
 ### Testing
 To test your trained model, use:
