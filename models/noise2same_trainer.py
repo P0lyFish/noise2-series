@@ -132,4 +132,4 @@ class Noise2SameTrainer(BaseTrainer):
         self.optimizer_G.step()
 
         # set log
-        self.log_dict['l_total'] = l_total.item()
+        self.log_dict['l_total'] = l_total.item() / batchsz
