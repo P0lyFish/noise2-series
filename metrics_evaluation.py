@@ -69,7 +69,8 @@ def evaluation(model_path, save_path,
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('--model', type=str,
-                        choices=['noise2self', 'noise2true', ],
+                        choices=['noise2true', 'noise2noise', 'noise2void',
+                                 'noise2self', 'noise2same'],
                         required=True,
                         help='Denoising model')
     parser.add_argument('--pretrained_path', type=str,
