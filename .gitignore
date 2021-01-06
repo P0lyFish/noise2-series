@@ -2,4 +2,7 @@
 *.swp
 *.png
 results/*
-pretrained_models/*.pth
+pretrained_models/*
+!pretrained_models/README.md
+datasets/*
+!datasets/README.md

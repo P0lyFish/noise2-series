@@ -30,6 +30,8 @@ def create_dataset(dataset_opt):
     # datasets for image restoration
     if mode == 'BSD68':
         from data.bsd_dataset import BSD68Dataset as D
+    elif mode == 'ImageNet':
+        from data.imagenet_dataset import ImageNetDataset as D
     else:
         raise NotImplementedError('Dataset [{:s}] is not recognized.'.format(mode))
     dataset = D(dataset_opt)
