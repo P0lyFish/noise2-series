@@ -1,7 +1,7 @@
 #### general settings
 name: ImageNet_noise2noise
 use_tb_logger: true
-trainer: noise2noise
+trainer: noise2true
 scale: 1
 gpu_ids: [0]
 
@@ -12,7 +12,7 @@ datasets:
     mode: &MODE ImageNet
     interval_list: [1]
     LQ_data: datasets/ImageNet/train/noise.npy
-    HQ_data: datasets/ImageNet/train/clean.npy
+    HQ_data: datasets/ImageNet/train/noise2.npy
 
     use_shuffle: true
     n_workers: 4  # per GPU

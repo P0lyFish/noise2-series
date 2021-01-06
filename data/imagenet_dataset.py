@@ -31,20 +31,14 @@ class ImageNetDataset(data.Dataset):
         else:
             self.need_GT = False
 
-        self.cropper = PadAndCropResizer()
-
         assert self.LQ_data.shape[0], 'Error: LQ data is empty.'
 
     def __getitem__(self, index):
-        img_LQ = self.LQ_data[index]
+        img_LQ = self.LQ_data[index] / 255.
         if self.need_GT:
-            img_HQ = self.HQ_data[index]
+            img_HQ = self.HQ_data[index] / 255.
         else:
             img_HQ = None
-
-        img_LQ = img_LQ[:, :] / 255.
-        if self.need_GT:
-            img_HQ = img_HQ[:, :] / 255.
 
         if self.opt['phase'] == 'train':
             H, W, _ = img_LQ.shape
