@@ -1,0 +1,5 @@
+opencv-python
+torch >= 1.4.0
+torchvision >= 0.5.0
+tensorboard >= 1.14
+pyyaml
