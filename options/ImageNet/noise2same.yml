@@ -57,7 +57,7 @@ train:
 
   pixel_criterion: l2
   pixel_weight: 1.0
-  inv_weight: 2.0
+  inv_weight: 7.0
   val_freq: !!float 5000
 
   manual_seed: 0
