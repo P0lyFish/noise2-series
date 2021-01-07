@@ -30,7 +30,7 @@ class StratifiedMasker(BaseMasker):
 
         return mask
 
-    def mask(self, X):
+    def mask_single_channel(self, X):
         mask = self.stratified_mask(X, self.box_size)
 
         mask = mask.to(X.device)
