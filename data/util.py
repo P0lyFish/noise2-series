@@ -1,4 +1,5 @@
 import os
+import os.path as osp
 import math
 import pickle
 import random
@@ -6,6 +7,8 @@ import numpy as np
 import glob
 import torch
 import cv2
+
+from data.data_storages import LmdbDataStorage, NumpyDataStorage
 
 ####################
 # Files & IO
@@ -81,8 +84,6 @@ def read_img(env, path, size=None):
         img = cv2.imread(path, cv2.IMREAD_UNCHANGED)
     else:
         img = _read_img_lmdb(env, path, size)
-    if type(img) == type(None):
-        print(path)
     img = img.astype(np.float32) / 255.
     if img.ndim == 2:
         img = np.expand_dims(img, axis=2)
@@ -90,6 +91,18 @@ def read_img(env, path, size=None):
     if img.shape[2] > 3:
         img = img[:, :, :3]
     return img
+
+
+def load_data_storage(data_path):
+    if data_path is None:
+        return None
+
+    if osp.splitext(data_path)[1] == '.npy':
+        return NumpyDataStorage(data_path)
+    elif osp.splitext(data_path)[1] == '.lmdb':
+        return LmdbDataStorage(data_path)
+    else:
+        raise NotImplementedError('Unrecognized datatype')
 
 
 def read_img_gray(env, path, size=None):
@@ -122,17 +135,6 @@ def read_img_seq(path):
     imgs = imgs[:, :, :, [2, 1, 0]]
     imgs = torch.from_numpy(np.ascontiguousarray(np.transpose(imgs, (0, 3, 1, 2)))).float()
     return imgs
-
-
-def read_LM_seq(path):
-    if type(path) is list:
-        LM_path_l = path
-    else:
-        LM_path_l = sorted(glob.glob(os.path.join(path, '*')))
-    LM_l = [read_landmarks_hm(v.replace('LQ', 'HM').replace('png', 'pt')) for v in LM_path_l]
-    LMs = np.stack(LM_l, axis=0)
-    LMs = torch.from_numpy(LMs).float()
-    return LMs
 
 
 def index_generation(crt_i, max_n, N, padding='reflection'):

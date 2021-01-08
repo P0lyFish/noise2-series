@@ -11,7 +11,7 @@ datasets:
     name: &NAME ImageNet
     mode: &MODE ImageNet
     interval_list: [1]
-    LQ_data: datasets/ImageNet/train/noise.npy
+    LQ_data: datasets/ImageNet/train/noise.lmdb
     HQ_data: ~
 
     use_shuffle: true
@@ -24,8 +24,8 @@ datasets:
     name: *NAME
     mode: *MODE
     interval_list: [1]
-    LQ_data: datasets/ImageNet/val/noise.npy
-    HQ_data: datasets/ImageNet/val/clean.npy
+    LQ_data: datasets/ImageNet/val/noise.lmdb
+    HQ_data: datasets/ImageNet/val/clean.lmdb
 
     use_shuffle: false
     n_workers: 4  # per GPU

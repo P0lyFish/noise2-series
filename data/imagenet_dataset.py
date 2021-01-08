@@ -8,7 +8,6 @@ import torch
 import torch.utils.data as data
 
 import data.util as util
-from utils.util import PadAndCropResizer
 
 logger = logging.getLogger('base')
 
@@ -23,15 +22,15 @@ class ImageNetDataset(data.Dataset):
         self.opt = opt
         # temporal augmentation
 
-        self.LQ_data = np.load(opt['LQ_data'], allow_pickle=True)
+        self.LQ_data = util.load_data_storage(opt['LQ_data'])
+        self.HQ_data = util.load_data_storage(opt['HQ_data'])
 
-        if opt['HQ_data'] is not None:
-            self.HQ_data = np.load(opt['HQ_data'], allow_pickle=True)
-            self.need_GT = True
+        if self.HQ_data is not None:
+                self.need_GT = True
         else:
             self.need_GT = False
 
-        assert self.LQ_data.shape[0], 'Error: LQ data is empty.'
+        assert len(self.LQ_data), 'Error: LQ data is empty.'
 
     def __getitem__(self, index):
         img_LQ = self.LQ_data[index] / 255.
@@ -67,4 +66,4 @@ class ImageNetDataset(data.Dataset):
         return {'LQ': img_LQ}
 
     def __len__(self):
-        return self.LQ_data.shape[0]
+        return len(self.LQ_data)
