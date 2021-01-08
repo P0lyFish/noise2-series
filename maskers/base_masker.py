@@ -6,18 +6,16 @@ class BaseMasker:
     @staticmethod
     def interpolate_mask(tensor, mask, mask_inv):
         _, num_channels, _, _ = tensor.shape
-        device = tensor.device
+        if num_channels != 1:
+            raise ValueError("number of channels must be 1")
 
+        device = tensor.device
         mask = mask.to(device)
 
         kernel = np.array([[0.5, 1.0, 0.5], [1.0, 0.0, 1.0], (0.5, 1.0, 0.5)])
         kernel = kernel[np.newaxis, np.newaxis, :, :]
         kernel = torch.Tensor(kernel).to(device)
         kernel = kernel / kernel.sum()
-
-        multi_channel_kernel = torch.zeros((num_channels, num_channels, 3, 3))
-        for i in range(num_channels):
-            multi_channel_kernel[i, i, :, :] = kernel
 
         filtered_tensor = torch.nn.functional.conv2d(tensor, kernel,
                                                      stride=1, padding=1)

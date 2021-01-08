@@ -22,6 +22,9 @@ class PhaseMasker(BaseMasker):
         return torch.Tensor(A)
 
     def mask_single_channel(self, X):
+        if num_channels != 1:
+            raise ValueError("number of channels must be 1")
+
         i = np.random.randint(1000)
         phasex = i % self.grid_size
         phasey = (i // self.grid_size) % self.grid_size
