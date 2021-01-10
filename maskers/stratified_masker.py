@@ -31,9 +31,6 @@ class StratifiedMasker(BaseMasker):
         return mask
 
     def mask_single_channel(self, X):
-        if num_channels != 1:
-            raise ValueError("number of channels must be 1")
-
         mask = self.stratified_mask(X[0, 0].shape, self.box_size)
         mask = mask.to(X.device)
         mask_inv = torch.ones(mask.shape).to(X.device) - mask
@@ -45,3 +42,4 @@ class StratifiedMasker(BaseMasker):
         else:
             raise NotImplementedError
 
+        return masked, mask
