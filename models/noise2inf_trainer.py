@@ -4,19 +4,19 @@ from collections import OrderedDict
 import torch
 import torch.nn as nn
 from torch.nn.parallel import DataParallel, DistributedDataParallel
+
 import models.lr_scheduler as lr_scheduler
 from .base_trainer import BaseTrainer
 from models.loss import CharbonnierLoss
 from models.unet import Unet
-import numpy as np
-from maskers.stratified_masker import StratifiedMasker
+from maskers.nd_masker import NDMasker
 
 logger = logging.getLogger('base')
 
 
-class Noise2SameTrainer(BaseTrainer):
+class Noise2InfTrainer(BaseTrainer):
     def __init__(self, opt):
-        super(Noise2SameTrainer, self).__init__(opt)
+        super(Noise2InfTrainer, self).__init__(opt)
 
         if opt['dist']:
             self.rank = torch.distributed.get_rank()
@@ -35,7 +35,7 @@ class Noise2SameTrainer(BaseTrainer):
         else:
             self.netG = DataParallel(self.netG)
 
-        self.masker = StratifiedMasker(box_size=train_opt['box_size'], mode='interpolate')
+        self.masker = NDMasker(radius=2, box_size=train_opt['box_size'])
 
         # print network
         self.print_network()
@@ -55,7 +55,6 @@ class Noise2SameTrainer(BaseTrainer):
             else:
                 raise NotImplementedError('Loss type [{:s}] is not\
                                           recognized.'.format(loss_type))
-            self.inv_w = train_opt['inv_weight']
 
             # optimizers
             wd_G = train_opt['weight_decay_G'] if train_opt['weight_decay_G']\
@@ -81,7 +80,6 @@ class Noise2SameTrainer(BaseTrainer):
                                                 betas=(train_opt['beta1'],
                                                        train_opt['beta2']))
             self.optimizers.append(self.optimizer_G)
-            self.eps = 1e-7
 
             # schedulers
             if train_opt['lr_scheme'] == 'MultiStepLR':
@@ -112,18 +110,14 @@ class Noise2SameTrainer(BaseTrainer):
             self.log_dict = OrderedDict()
 
     def optimize_parameters(self, step):
-        batchsz, C, H, W = self.LQ.shape
+        batchsz, _, _, _ = self.LQ.shape
 
         self.optimizer_G.zero_grad()
 
         inp, mask = self.masker.mask(self.LQ)
-        out_masked = self.netG(inp)
-        out_raw = self.netG(self.LQ)
+        out = self.netG(inp)
 
-        l_rec = self.cri_pix(out_raw, self.LQ) / (C * H * W)
-        l_inv = torch.sqrt(self.cri_pix(out_raw * mask,
-                                        out_masked * mask) / (torch.sum(mask)))
-        l_total = l_rec + l_inv * self.inv_w
+        l_total = self.cri_pix(out * mask, self.LQ * mask)
 
         l_total.backward()
         self.optimizer_G.step()
