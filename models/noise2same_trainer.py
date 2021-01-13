@@ -122,8 +122,7 @@ class Noise2SameTrainer(BaseTrainer):
 
         l_rec = self.cri_pix(out_raw, self.LQ) / (C * H * W)
         l_inv = torch.sqrt(self.cri_pix(out_raw * mask,
-                                        out_masked * mask) / (torch.sum(mask) *
-                                            C))
+                                        out_masked * mask) / (torch.sum(mask)))
         l_total = l_rec + l_inv * self.inv_w
 
         l_total.backward()

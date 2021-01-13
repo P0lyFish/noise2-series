@@ -7,7 +7,7 @@ import models.arch_util as arch_util
 
 
 class NoSkipNet(nn.Module):
-    def __init__(self, input_nc=3, output_nc=3, ngf=64, norm_layer=nn.BatchNorm2d, n_blocks=6, padding_type='reflect'):
+    def __init__(self, input_nc=3, output_nc=3, ngf=64, norm_layer=nn.InstanceNorm2d, n_blocks=6, padding_type='reflect'):
         assert(n_blocks >= 0)
         super(NoSkipNet, self).__init__()
         self.input_nc = input_nc
@@ -34,7 +34,7 @@ class NoSkipNet(nn.Module):
 
         mult = 2**n_downsampling
         for i in range(n_blocks):
-            model += [ResnetBlock(ngf * mult, padding_type=padding_type, norm_layer=norm_layer, use_dropout=use_dropout, use_bias=use_bias)]
+            model += [ResnetBlock(ngf * mult, padding_type=padding_type, norm_layer=norm_layer, use_bias=use_bias)]
 
         for i in range(n_downsampling):
             mult = 2**(n_downsampling - i)
@@ -57,11 +57,14 @@ class NoSkipNet(nn.Module):
 
 # Define a resnet block
 class ResnetBlock(nn.Module):
-    def __init__(self, dim, padding_type, norm_layer, use_dropout, use_bias):
+    def __init__(self, dim, padding_type, norm_layer, use_bias):
         super(ResnetBlock, self).__init__()
-        self.conv_block = self.build_conv_block(dim, padding_type, norm_layer, use_dropout, use_bias)
+        self.conv_block1 = self.build_conv_block(dim, padding_type,
+                                                 norm_layer, use_bias)
+        self.conv_block2 = self.build_conv_block(dim, padding_type,
+                                                 norm_layer, use_bias)
 
-    def build_conv_block(self, dim, padding_type, norm_layer, use_dropout, use_bias):
+    def build_conv_block(self, dim, padding_type, norm_layer, use_bias):
         conv_block = []
         p = 0
         if padding_type == 'reflect':
@@ -76,9 +79,6 @@ class ResnetBlock(nn.Module):
         conv_block += [nn.Conv2d(dim, dim, kernel_size=3, padding=p, bias=use_bias),
                        norm_layer(dim),
                        nn.ReLU(True)]
-        if use_dropout:
-            conv_block += [nn.Dropout(0.5)]
-
         p = 0
         if padding_type == 'reflect':
             conv_block += [nn.ReflectionPad2d(1)]
@@ -94,7 +94,8 @@ class ResnetBlock(nn.Module):
         return nn.Sequential(*conv_block)
 
     def forward(self, x):
-        out = x + self.conv_block(x)
+        out = x + self.conv_block1(x)
+        out = self.conv_block2(x)
         return out
 
 

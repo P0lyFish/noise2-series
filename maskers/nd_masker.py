@@ -12,8 +12,10 @@ class NDMasker(StratifiedMasker):
 
         self.selection_dist = signal.gaussian(radius * 2 + 1, std=radius)
         self.selection_dist = self.selection_dist / self.selection_dist.sum()
-     
+
     def mask_single_channel(self, X):
+        device = X.device
+
         C, H, W = X[0].shape
         if C != 1:
             raise ValueError("number of channels must be 1")
@@ -31,10 +33,11 @@ class NDMasker(StratifiedMasker):
                     target_x.append(x)
                     target_y.append(y)
 
-        avg_kernel = torch.ones(1, 1, self.radius * 2 + 1, self.radius * 2 + 1)
+        avg_kernel = torch.ones(1, 1, self.radius * 2 + 1,
+                                self.radius * 2 + 1).to(device)
         avg_kernel = avg_kernel / avg_kernel.sum()
         avg_X = F.conv2d(X, avg_kernel, stride=1, padding=self.radius)
-        
+
         masked_xs = []
         masked_ys = []
         for x, y in zip(target_x, target_y):
@@ -50,11 +53,11 @@ class NDMasker(StratifiedMasker):
                 masked_xs.append(masked_x)
                 masked_ys.append(masked_y)
 
-        target_mask = torch.zeros((H, W))
+        target_mask = torch.zeros((H, W)).to(device)
         target_mask[target_x, target_y] = 1.
         inv_target_mask = 1 - target_mask
 
-        mask = torch.zeros((H, W))
+        mask = torch.zeros((H, W)).to(device)
         mask[masked_xs, masked_ys] = 1.
         inv_mask = 1 - mask
 

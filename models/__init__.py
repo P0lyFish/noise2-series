@@ -13,6 +13,8 @@ def get_trainer(opt):
         from .noise2same_trainer import Noise2SameTrainer as M
     elif model == 'noise2void':
         from .noise2void_trainer import Noise2VoidTrainer as M
+    elif model == 'noise2inf':
+        from .noise2inf_trainer import Noise2InfTrainer as M
     else:
         raise NotImplementedError('Trainer [{:s}] not recognized.'.format(model))
     m = M(opt)

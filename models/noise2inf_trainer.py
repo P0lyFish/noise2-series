@@ -1,3 +1,4 @@
+
 import logging
 from collections import OrderedDict
 
@@ -7,8 +8,9 @@ from torch.nn.parallel import DataParallel, DistributedDataParallel
 import models.lr_scheduler as lr_scheduler
 from .base_trainer import BaseTrainer
 from models.loss import CharbonnierLoss
-from models.unet import Unet
+from models.no_skip_net import NoSkipNet
 import numpy as np
+from maskers.phase_masker import PhaseMasker
 
 logger = logging.getLogger('base')
 
@@ -24,7 +26,8 @@ class Noise2InfTrainer(BaseTrainer):
         train_opt = opt['train']
 
         # define network and load pretrained models
-        self.netG = NoSkipNet(1, 1).to(self.device)
+        self.netG = NoSkipNet(opt['network_G']['img_channels'],
+                              opt['network_G']['img_channels']).to(self.device)
         if opt['dist']:
             self.netG = DistributedDataParallel(self.netG,
                                                 device_ids=[
@@ -111,7 +114,7 @@ class Noise2InfTrainer(BaseTrainer):
         self.optimizer_G.zero_grad()
 
         out = self.netG(self.LQ)
-        l_total = self.cri_pix(out * mask, self.LQ * mask)
+        l_total = self.cri_pix(out, self.LQ)
 
         l_total.backward()
         self.optimizer_G.step()
